@@ -1,5 +1,10 @@
+import java.io.BufferedOutputStream
+import java.io.BufferedWriter
 import java.io.DataOutputStream
+import java.io.FileWriter
 import java.util.*
+import javax.print.attribute.IntegerSyntax
+import kotlin.reflect.jvm.internal.impl.renderer.ClassifierNamePolicy
 import kotlin.system.exitProcess
 
 var line = 1
@@ -10,7 +15,7 @@ val addressMap = HashMap<String,Int>()
 
 fun dealCode() {
     outStream = DataOutputStream(targetFile.outputStream())
-
+    txtOut = BufferedWriter(FileWriter(txtFile))
     markAddress()
     println(addressMap)
 
@@ -30,8 +35,25 @@ fun dealCode() {
         val arguments = datas[1]
         val binary = convertInsToByte(instruction, arguments)
         outStream!!.writeInt(binary)
+        txtOut!!.write(IntToBinaryString(binary))
+        txtOut!!.newLine()
         line++
     }
+
+    outStream?.close()
+    txtOut?.close()
+}
+
+fun IntToBinaryString(int: Int):String{
+    val builder = StringBuilder()
+    val data = Integer.toBinaryString(int)
+    var i = data.length
+    while (i<32){
+        builder.append('0')
+        i++
+    }
+    builder.append(data)
+    return builder.toString()
 }
 
 fun markAddress(){
@@ -96,20 +118,28 @@ fun getNumberOfRegister(arg: String): String {
 }
 
 fun getImmediate(arg: String, size: Int): String {
-    val number = if (arg.isHex()){
-        arg.toLowerCase().replace("0x","").toInt(16)
-    }else if (arg.isOct()){
-        arg.toInt(10)
+    val byteNumber = if (arg.isOct()){
+        if (size<=16){
+            val s = arg.toShort(10)
+            println(s)
+            Integer.toBinaryString(NumberFormatUtil.toUnsigedInt(s))
+        }else{
+            Integer.toBinaryString(Integer.parseInt(arg,10))
+        }
+        //arg.toInt(10)
+    }else if (arg.isHex()){
+        val n = arg.toLowerCase().replace("0x","")
+        Integer.toBinaryString(Integer.parseInt(n,16))
     }else{
         if (!addressMap.containsKey(arg)){
             println("Not found address mark : $arg ; line:$line")
             exitError()
-            0
+            "0"
         }else{
-            addressMap[arg]!!
+            Integer.toBinaryString(addressMap[arg]!!)
         }
     }
-    val byteNumber = number.toString(2)
+
     val builder = StringBuilder()
     var i = byteNumber.length
     while (i < size) {
@@ -175,7 +205,7 @@ fun dealIType(ins: String, args: String): Int {
         val resultRegister = getNumberOfRegister(argsList[0])
         val firstRegister = getNumberOfRegister(argsList[1])
         val immediate = getImmediate(argsList[2], 16)
-        println(immediate)
+        //println(immediate)
         builder.append(iMap[ins])
                 .append(firstRegister)
                 .append(resultRegister)

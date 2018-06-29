@@ -7,6 +7,14 @@ val map = hashMapOf(
 
 fun main(args: Array<String>) {
 
+    val number3 = "0x80"
+    println(number3.isOct())
+    println(Integer.toBinaryString(NumberFormatUtil.toUnsigedInt(number3.toShort(10))))
+
+    val number2 = "-111"
+    println(number2.toInt(10))
+    println(number2.toInt(10).toString(2))
+
     val oct = "+55111"
     println(oct.substring(1 until oct.length))
     println(oct.isOct())
