@@ -6,6 +6,9 @@ val map = hashMapOf(
 )
 
 fun main(args: Array<String>) {
+    var s = "123456789"
+    println(s.substring(s.length-4 until s.length))
+
 
     val number3 = "0x80"
     println(number3.isOct())

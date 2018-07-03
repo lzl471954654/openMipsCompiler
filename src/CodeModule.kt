@@ -3,13 +3,14 @@ import java.io.BufferedWriter
 import java.io.DataOutputStream
 import java.io.FileWriter
 import java.util.*
-import javax.print.attribute.IntegerSyntax
-import kotlin.reflect.jvm.internal.impl.renderer.ClassifierNamePolicy
 import kotlin.system.exitProcess
 
 var line = 1
 var codeAddress = 0
 var codeLine = 0
+var index = 0
+
+var super_ins : String? = null
 
 val addressMap = HashMap<String,Int>()
 
@@ -18,10 +19,19 @@ fun dealCode() {
     txtOut = BufferedWriter(FileWriter(txtFile))
     markAddress()
     println(addressMap)
-    var index = 0
 
-    while (srcScanner.hasNext()) {
-        val lineData = srcScanner.nextLine().trimStart(' ')
+    while (srcScanner.hasNext() || super_ins != null) {
+        val lineData = if (super_ins != null){
+            super_ins!!
+        }else{
+            srcScanner.nextLine().trimStart(' ')
+        }
+
+        super_ins = if (srcScanner.hasNext())
+            srcScanner.nextLine().trimStart(' ')
+        else
+            null
+
         if (lineData.startsWith('#') || lineData.endsWith(':')){
             line++
             continue
@@ -235,6 +245,34 @@ fun dealJType(ins: String, args: String): Int {
                 .append(jMap[ins])
     } else {
         val immediate = getImmediate(args, 26)
+        /*val tempNumber = immediate.toMyInt() shl 2
+        var tempNumberString = Integer.toBinaryString(tempNumber)
+        var count = tempNumberString.length
+        var builderString = StringBuilder()
+        if (count > 26){
+            builderString.append(tempNumberString.substring(tempNumberString.length-26 until tempNumberString.length))
+        }else{
+            while (count < 26){
+                builderString.append('0')
+                count++
+            }
+            builderString.append(tempNumberString)
+        }
+        tempNumberString = builderString.toString()
+        var replaceString = if (super_ins == null)
+            "0000"
+        else{
+            val datas = super_ins!!.split("\\s+".toRegex())
+            val next_ins = datas[0]
+            if (next_ins in rMap){
+                "0000"
+            }else if (next_ins in iMap){
+                iMap[next_ins]!!.substring(0 until 4)
+            }else
+                "0000"
+        }
+        tempNumberString = tempNumberString.replaceRange(0 until 4,replaceString)*/
+
         builder.append(jMap[ins])
                 .append(immediate)
     }
