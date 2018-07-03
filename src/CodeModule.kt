@@ -18,6 +18,7 @@ fun dealCode() {
     txtOut = BufferedWriter(FileWriter(txtFile))
     markAddress()
     println(addressMap)
+    var index = 0
 
     while (srcScanner.hasNext()) {
         val lineData = srcScanner.nextLine().trimStart(' ')
@@ -25,19 +26,26 @@ fun dealCode() {
             line++
             continue
         }
-        val datas = lineData.split(" ")
+        val datas = lineData.split("\\s+".toRegex())
         if (datas.size > 2 || datas.isEmpty()) {
             println("invalid line : $line")
             closeStream()
             exitError()
         }
         val instruction = datas[0]
-        val arguments = datas[1]
-        val binary = convertInsToByte(instruction, arguments)
+        var binary:Int
+        if (instruction != "nop"){
+            val arguments = datas[1]
+            binary = convertInsToByte(instruction, arguments)
+        }else{
+            binary = 0
+        }
         outStream!!.writeInt(binary)
-        txtOut!!.write(IntToBinaryString(binary))
+        val roomData = "inst_mem[$index] = 32'b${IntToBinaryString(binary)};"
+        txtOut!!.write(roomData)
         txtOut!!.newLine()
         line++
+        index++
     }
 
     outStream?.close()
@@ -69,7 +77,7 @@ fun markAddress(){
 
             }else{
                 val ins = datas[0]
-                if ( ins in jMap || ins in rMap || ins in iMap){
+                if ( ins in jMap || ins in rMap || ins in iMap || ins == "nop"){
                     codeLine ++
                     codeAddress = codeLine * 4
                 }
@@ -163,8 +171,8 @@ fun dealRType(ins: String, args: String): Int {
         val firstRegister = getNumberOfRegister(argsList[1])
         val secondRegister = getNumberOfRegister(argsList[2])
         builder.append(firstRegister)
-                .append(resultRegister)
                 .append(secondRegister)
+                .append(resultRegister)
                 .append("00000")
                 .append(rMap[ins])
 
@@ -288,3 +296,5 @@ val jMap = hashMapOf(
         "j" to "000010",
         "jal" to "000011"
 )
+
+const val nop = "00000000000000000000000000000000"
