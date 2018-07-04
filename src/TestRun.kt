@@ -6,6 +6,9 @@ val map = hashMapOf(
 )
 
 fun main(args: Array<String>) {
+    println("11111111111111111111111111110000".toMyInt())
+    println(Integer.toBinaryString((12-32)))
+    println(Integer.toBinaryString((12-32)).substring(14 until  32-2))
     var s = "123456789"
     println(s.substring(s.length-4 until s.length))
 

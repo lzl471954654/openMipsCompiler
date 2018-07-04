@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         return
     }
     val targetFilePath = srcFile.parent + srcFile.name + ".data"
-    val txtFilePath = srcFile.path + srcFile.name + ".txt"
+    val txtFilePath = srcFile.path + ".out" + ".txt"
     srcScanner = Scanner(srcFile.inputStream())
     targetFile = File(targetFilePath)
     if (targetFile.exists()){
@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
     txtFile.createNewFile()
     dealCode()
     closeStream()
+    println("Compiler Success!")
 }
 
 fun closeStream(){

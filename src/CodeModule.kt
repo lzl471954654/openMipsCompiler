@@ -219,7 +219,31 @@ fun dealIType(ins: String, args: String): Int {
                 .append("00000")
                 .append(resultRegister)
                 .append(immediate)
-    } else {
+    } else if (ins == "beq" || ins == "bne"){
+        val resultRegister = getNumberOfRegister(argsList[0])
+        val firstRegister = getNumberOfRegister(argsList[1])
+        var immediate = getImmediate(argsList[2], 32)
+        var number = immediate.toMyInt()
+        number -= if (super_ins != null){
+            (index + 1) * 4
+        }else{
+            0
+        }
+        immediate = Integer.toBinaryString(number)
+        var size = immediate.length
+        val numberBuilder = StringBuilder()
+        while (size < 32){
+            numberBuilder.append('0')
+            size++
+        }
+        numberBuilder.append(immediate)
+        //numberBuilder.append(immediate.substring(14 until 32-2))
+
+        builder.append(iMap[ins])
+                .append(firstRegister)
+                .append(resultRegister)
+                .append(numberBuilder.toString().substring(14 until 30))
+    }else{
         val resultRegister = getNumberOfRegister(argsList[0])
         val firstRegister = getNumberOfRegister(argsList[1])
         val immediate = getImmediate(argsList[2], 16)
@@ -244,7 +268,9 @@ fun dealJType(ins: String, args: String): Int {
                 .append("00000")
                 .append(jMap[ins])
     } else {
-        val immediate = getImmediate(args, 26)
+        var immediate = getImmediate(args, 28)
+        immediate = immediate.substring(0 until immediate.length-2)
+
         /*val tempNumber = immediate.toMyInt() shl 2
         var tempNumberString = Integer.toBinaryString(tempNumber)
         var count = tempNumberString.length
@@ -271,7 +297,12 @@ fun dealJType(ins: String, args: String): Int {
             }else
                 "0000"
         }
-        tempNumberString = tempNumberString.replaceRange(0 until 4,replaceString)*/
+        tempNumberString = tempNumberString.replaceRange(0 until 4,replaceString)
+
+
+        builder.append(jMap[ins])
+                .append(tempNumberString)*/
+
 
         builder.append(jMap[ins])
                 .append(immediate)
